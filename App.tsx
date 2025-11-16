@@ -105,7 +105,7 @@ const App: React.FC = () => {
 
     const requestWakeLock = async () => {
       try {
-        if (!wakeLockRef.current) {
+        if (!wakeLockRef.current || wakeLockRef.current.released) {
           const lock = await navigator.wakeLock.request('screen');
           wakeLockRef.current = lock;
           lock.addEventListener('release', () => {
@@ -114,12 +114,16 @@ const App: React.FC = () => {
           });
         }
       } catch (err) {
-        console.error(`Failed to acquire Wake Lock: ${(err as Error).name}, ${(err as Error).message}`);
+        if (err instanceof Error && err.name === 'NotAllowedError') {
+          console.warn('Screen Wake Lock was denied by the browser. The screen may turn off.');
+        } else {
+          console.error(`Failed to acquire Wake Lock: ${(err as Error).name}, ${(err as Error).message}`);
+        }
       }
     };
 
     const releaseWakeLock = async () => {
-      if (wakeLockRef.current) {
+      if (wakeLockRef.current && !wakeLockRef.current.released) {
         await wakeLockRef.current.release();
         wakeLockRef.current = null;
       }
@@ -181,7 +185,7 @@ const App: React.FC = () => {
       <section
         onClick={() => handlePlayerAreaClick('player2')}
         className={`flex-1 flex justify-center items-center cursor-pointer transition-colors duration-300 ease-in-out ${
-          player1IsActive ? 'bg-green-600' : 'bg-gray-800 hover:bg-gray-700'
+          player2IsActive ? 'bg-green-600' : 'bg-gray-800 hover:bg-gray-700'
         }`}
       >
         <div className="transform rotate-180 flex flex-col items-center">
@@ -216,7 +220,7 @@ const App: React.FC = () => {
       <section
         onClick={() => handlePlayerAreaClick('player1')}
         className={`flex-1 flex justify-center items-center cursor-pointer transition-colors duration-300 ease-in-out ${
-          player2IsActive ? 'bg-green-600' : 'bg-gray-800 hover:bg-gray-700'
+          player1IsActive ? 'bg-green-600' : 'bg-gray-800 hover:bg-gray-700'
         }`}
       >
         <div className="flex flex-col items-center">
