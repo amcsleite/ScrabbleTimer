@@ -1,0 +1,5 @@
+{
+  "name": "Scrabble Clock",
+  "description": "A simple, full-screen Scrabble timer for two players, designed for mobile devices. Tap your side to switch the timer to your opponent. Features pause, reset, and state persistence using localStorage.",
+  "requestFramePermissions": []
+}
